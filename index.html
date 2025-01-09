@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <audio controls id="music" class="music" loop style="visibility: hidden;">
+        <source src="https://r2.interrupted.me/bio/assets/167_JUCS.mp3" type="audio/mpeg">
+    </audio>
+    <style>
+  @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&amp;display=swap');
+  * {
+    cursor: url('https://r2.interrupted.me/bio/assets/167_AINx.cur'), auto;
+  }
+  *:hover {
+            cursor: url("https://r2.interrupted.me/bio/assets/167_AINx.cur"), auto;
+        }
+      body {
+        background-image: linear-gradient(to right, cornflowerblue, hotpink);
+        font-family: open-sans, sans-serif;
+      }
+      div {
+        position: relative;
+        width: 25%;
+        height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        background-color:#0001;
+        padding: 1px;
+        margin: 0 auto; /* Add this line */
+        flex-direction: column;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      }
+      #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #overlay-text {
+      font-size: 48px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    #overlay-button {
+      cursor: pointer;
+    }
+    .box {
+      background-color: black;
+      border: 1px solid black;
+      padding: 100px;
+      width: 1150px;
+      text-align: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+    }
+
+
+    </style>
+  </head>
+  <div>
+      <img src="https://avatars.githubusercontent.com/u/152616221?v=4" style="width: 165px; height: 165px; object-fit: cover; border-radius: 10px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);">
+      <h1 style="font-size:smaller; height: 0.00001px; filter:drop-shadow(2px 7px 6px black)">@flippyboyy</h1>
+      <h1 style="text-align: center; color: black; filter:drop-shadow(4px 7px 4px black)">Hezcheats</h1>
+      <a href="https://www.youtube.com/@hezcheats/" target="_blank" style="display: inline-block; position: relative;">
+        <img src="https://cdn3.iconfinder.com/data/icons/social-network-30/512/social-06-512.png" alt="Youtube" style="width: 65px; height: 65px; filter: drop-shadow(0px 3px 10px black);">
+      </a>
+      <audio id="audio-player" src="https://r2.interrupted.me/bio/assets/167_JUCS.mp3" type="audio/mp3"></audio>
+ <script>
+   const audioPlayer = document.getElementById('audio-player');
+
+   document.addEventListener('click', () => {
+    audioPlayer.play();
+  });
+</script>
+</div>
+<div class="box" style="transition: opacity 3s;">
+  <h2 style="font-family: indie flower; color: violet; transition: opacity 0.25s;">Click to enter!</h2>
+</div>
+
+<!-- Get the box element using its class -->
+<script>
+  const box = document.querySelector('.box');
+  const text = box.querySelector('h2');
+
+  // Add an event listener for the click event
+  box.addEventListener('click', () => {
+    // Set the opacity to 0 for both the box and the text
+    box.style.opacity = 0;
+    text.style.opacity = 0;
+    // Remove the box element from the DOM after a short delay
+    setTimeout(() => box.remove(), 1000);
+  });
+</script>
+  </body>
+</html>
