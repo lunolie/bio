@@ -1,106 +1,185 @@
 <!DOCTYPE html>
-<html>
-  <head>
-
-    <audio controls id="music" class="music" loop style="visibility: hidden;">
-        <source src="https://r2.interrupted.me/bio/assets/167_JUCS.mp3" type="audio/mpeg">
-    </audio>
-    <style>
-  @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&amp;display=swap');
-  * {
-    cursor: url('https://r2.interrupted.me/bio/assets/167_AINx.cur'), auto;
-  }
-  *:hover {
-            cursor: url("https://r2.interrupted.me/bio/assets/167_AINx.cur"), auto;
-        }
-      body {
-        background-image: linear-gradient(to right, cornflowerblue, hotpink);
-        font-family: open-sans, sans-serif;
-      }
-      div {
-        position: relative;
-        width: 25%;
-        height: 70vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 10px;
-        background-color:#0001;
-        padding: 1px;
-        margin: 0 auto; /* Add this line */
-        flex-direction: column;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-      }
-      #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>catcore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    #overlay-text {
-      font-size: 48px;
-      font-weight: bold;
-      color: #fff;
-    }
-
-    #overlay-button {
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: black;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
       cursor: pointer;
     }
-    .box {
-      background-color: black;
-      border: 1px solid black;
-      padding: 100px;
-      width: 1150px;
-      text-align: center;
-      position: fixed;
+
+    .content-wrapper {
+      position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      width: 25%;
+      height: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      background-color: #0001;
+      padding: 20px 10px;
+      flex-direction: column;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      z-index: 1001;
+    }
+
+    .content-wrapper.visible {
+      opacity: 1;
+    }
+
+    .fade-text, .video-wrapper {
+      position: absolute;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
       z-index: 1000;
     }
 
+    .fade-text.visible,
+    .video-wrapper.visible {
+      opacity: 1;
+    }
 
-    </style>
-  </head>
-  <div>
-      <img src="https://avatars.githubusercontent.com/u/152616221?v=4" style="width: 165px; height: 165px; object-fit: cover; border-radius: 10px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);">
-      <h1 style="font-size:smaller; height: 0.00001px; filter:drop-shadow(2px 7px 6px black)">@purrorcode</h1>
-      <h1 style="text-align: center; color: black; filter:drop-shadow(4px 7px 4px black)">catty</h1>
-      <a href="https://www.youtube.com/@purrorcode/" target="_blank" style="display: inline-block; position: relative;">
-        <img src="https://cdn3.iconfinder.com/data/icons/social-network-30/512/social-06-512.png" alt="Youtube" style="width: 65px; height: 65px; filter: drop-shadow(0px 3px 10px black);">
+    video {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+
+    #controller {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    #controller.visible {
+      opacity: 1;
+    }
+
+    .volume-icon {
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    input[type="range"] {
+      width: 100px;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Video -->
+  <div id="videoWrapper" class="video-wrapper">
+    <video id="videoElement" autoplay muted loop>
+      <source src="https://github.com/Hezcheats/bio/raw/refs/heads/main/spirit.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Welcome Text -->
+  <div id="fadeText" class="fade-text" style="font-size: xx-large; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    Welcome to catcore! Click anywhere to continue
+  </div>
+
+  <!-- Main Content -->
+  <div id="bioBox" class="content-wrapper">
+    <img src="https://i.pinimg.com/736x/f3/15/5f/f3155f33582d0c2b2313b516fe15e602.jpg" alt="Cat" style="width: 165px; height: 165px; object-fit: cover; border-radius: 10px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);">
+    <h1 style="font-size:smaller; filter:drop-shadow(2px 7px 6px black);">@purrorcode</h1>
+    <h1 style="text-align: center; color: black; filter:drop-shadow(4px 7px 4px black)">catty</h1>
+    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+      <a href="https://www.youtube.com/@purrorcode/" target="_blank">
+        <img src="https://cdn3.iconfinder.com/data/icons/social-network-30/512/social-06-512.png" alt="YouTube" style="width: 65px; height: 65px; filter: drop-shadow(0px 3px 10px black);">
       </a>
-      <audio id="audio-player" src="https://r2.interrupted.me/bio/assets/167_JUCS.mp3" type="audio/mp3"></audio>
- <script>
-   const audioPlayer = document.getElementById('audio-player');
+      <a href="https://discord.com" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/256/5968/5968756.png" alt="Discord" style="width: 65px; height: 65px; filter: drop-shadow(0px 3px 10px black);">
+      </a>
+    </div>
+  </div>
 
-   document.addEventListener('click', () => {
-    audioPlayer.play();
-  });
-</script>
-</div>
-<div class="box" style="transition: opacity 3s;">
-  <h2 style="font-family: indie flower; color: violet; transition: opacity 0.25s;">Click to enter!</h2>
-</div>
+  <!-- Audio Element -->
+  <audio id="audio-player" src="https://audio.jukehost.co.uk/bAYU53gtWZ1LrhP35nXW9txnPMwexiop" type="audio/mp3"></audio>
 
-<!-- Get the box element using its class -->
-<script>
-  const box = document.querySelector('.box');
-  const text = box.querySelector('h2');
+  <!-- Volume Controller -->
+  <div id="controller">
+    <span id="volume-icon" class="volume-icon">ð</span>
+    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.2">
+  </div>
 
-  // Add an event listener for the click event
-  box.addEventListener('click', () => {
-    // Set the opacity to 0 for both the box and the text
-    box.style.opacity = 0;
-    text.style.opacity = 0;
-    // Remove the box element from the DOM after a short delay
-    setTimeout(() => box.remove(), 1000);
-  });
-</script>
-  </body>
+  <script>
+    const audioPlayer = document.getElementById('audio-player');
+    const fadeText = document.getElementById('fadeText');
+    const videoWrapper = document.getElementById('videoWrapper');
+    const bioBox = document.getElementById('bioBox');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeIcon = document.getElementById('volume-icon');
+    const controller = document.getElementById('controller');
+
+    audioPlayer.volume = 0.2;
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        fadeText.classList.add("visible");
+      }, 100);
+    });
+
+    document.addEventListener("click", () => {
+      audioPlayer.play();
+      fadeText.classList.remove("visible");
+      videoWrapper.classList.add("visible");
+      bioBox.classList.add("visible");
+      controller.classList.add("visible");
+    }, { once: true });
+
+    volumeSlider.addEventListener('input', () => {
+      audioPlayer.volume = volumeSlider.value;
+      audioPlayer.muted = false;
+      updateVolumeIcon();
+    });
+
+    volumeIcon.addEventListener('click', () => {
+      audioPlayer.muted = !audioPlayer.muted;
+      updateVolumeIcon();
+    });
+
+    function updateVolumeIcon() {
+      if (audioPlayer.muted || audioPlayer.volume === 0) {
+        volumeIcon.textContent = 'ð';
+      } else if (audioPlayer.volume < 0.5) {
+        volumeIcon.textContent = 'ð';
+      } else {
+        volumeIcon.textContent = 'ð';
+      }
+    }
+
+    updateVolumeIcon();
+  </script>
+
+</body>
 </html>
