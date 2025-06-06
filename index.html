@@ -128,7 +128,7 @@
 
   <!-- Volume Controller -->
   <div id="controller">
-    <span id="volume-icon" class="volume-icon">ð</span>
+    <img id="volume-icon" class="volume-icon" src="https://img.icons8.com/?size=100&id=15992&format=png&color=000000" alt="Volume" width="24" height="24">
     <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.2">
   </div>
 
@@ -169,17 +169,15 @@
     });
 
     function updateVolumeIcon() {
-      if (audioPlayer.muted || audioPlayer.volume === 0) {
-        volumeIcon.textContent = 'ð';
-      } else if (audioPlayer.volume < 0.5) {
-        volumeIcon.textContent = 'ð';
-      } else {
-        volumeIcon.textContent = 'ð';
-      }
-    }
-
+    if (audioPlayer.muted || audioPlayer.volume === 0) {
+    volumeIcon.src = 'https://img.icons8.com/?size=100&id=9414&format=png&color=FFFFFF';
+    } else if (audioPlayer.volume < 0.5) {
+    volumeIcon.src = 'https://img.icons8.com/?size=100&id=9980&format=png&color=FFFFFF';
+    } else {
+    volumeIcon.src = 'https://img.icons8.com/?size=100&id=9982&format=png&color=FFFFFF';
+  }
+}
     updateVolumeIcon();
   </script>
-
 </body>
 </html>
