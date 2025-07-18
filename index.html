@@ -1,183 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>catcore</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>CRT Bio Terminal</title>
   <style>
-    * {
+    html, body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'JetBrains Mono', monospace;
-      background-color: black;
-      color: white;
-      height: 100vh;
+      background: black;
       overflow: hidden;
-      cursor: pointer;
-    }
-
-    .content-wrapper {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 25%;
-      height: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 10px;
-      background-color: #0001;
-      padding: 20px 10px;
-      flex-direction: column;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
-      z-index: 1001;
-    }
-
-    .content-wrapper.visible {
-      opacity: 1;
-    }
-
-    .fade-text, .video-wrapper {
-      position: absolute;
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
-      z-index: 1000;
-    }
-
-    .fade-text.visible,
-    .video-wrapper.visible {
-      opacity: 1;
-    }
-
-    video {
-      width: 100vw;
       height: 100vh;
-      object-fit: cover;
+      width: 100vw;
+      font-family: 'Courier New', Courier, monospace;
+      color: #00FF00;
     }
 
-    #controller {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 2000;
+    .crt-container, #bio-terminal {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      padding: 20px;
+      box-sizing: border-box;
+      text-shadow: 0 0 2px #00FF00;
+    }
+
+    .crt-container {
+      animation: crtPowerOn 1.5s ease-out forwards;
       opacity: 0;
-      transition: opacity 1s ease-in-out;
     }
 
-    #controller.visible {
+    @keyframes crtPowerOn {
+      0% {
+        opacity: 0;
+        transform: scaleY(0.01) scaleX(1.5);
+        filter: brightness(800%) blur(4px);
+      }
+      30% {
+        opacity: 1;
+        transform: scaleY(0.01) scaleX(1.2);
+      }
+      60% {
+        transform: scaleY(0.1) scaleX(1.1);
+        filter: brightness(200%);
+      }
+      100% {
+        opacity: 1;
+        transform: scaleY(1) scaleX(1);
+        filter: brightness(100%) blur(0);
+      }
+    }
+
+    .crt-sweep::after {
+      content: "";
+      position: absolute;
+      top: -150%;
+      left: 0;
+      width: 100%;
+      height: 150%;
+      background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.04) 45%,
+        rgba(255,255,255,0.1) 50%,
+        rgba(255,255,255,0.04) 55%,
+        rgba(255,255,255,0) 100%
+      );
+      animation: verticalSweep 3s linear infinite;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    @keyframes verticalSweep {
+      0% { top: -150%; }
+      100% { top: 100%; }
+    }
+
+    .scanlines::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 255, 0, 0.05),
+        rgba(0, 255, 0, 0.05) 2px,
+        transparent 3px,
+        transparent 5px
+      );
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .bg-animate {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(0, 255, 0, 0.05) 0,
+        rgba(0, 255, 0, 0.05) 1px,
+        transparent 2px,
+        transparent 10px
+      );
+      animation: gridMove 10s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 200px 200px; }
+    }
+
+    #boot-sequence {
+      z-index: 5;
+      transition: opacity 1s ease;
+    }
+
+    .boot-line {
+      opacity: 0;
+      transition: opacity 0.2s ease-in;
+    }
+
+    .boot-line.visible {
       opacity: 1;
     }
 
-    .volume-icon {
-      cursor: pointer;
-      font-size: 24px;
-    }
-
-    input[type="range"] {
-      width: 100px;
-    }
-
-    audio {
+    #bio-terminal {
       display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      z-index: 5;
+      opacity: 0;
+      animation: bioIn 1s ease forwards;
+    }
+
+    @keyframes bioIn {
+      0% {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    #bio-terminal img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border: 2px solid #00FF00;
+      margin-bottom: 15px;
+    }
+
+    .bio-line {
+      margin: 5px 0;
+    }
+
+    .terminal-links a {
+      color: #00FF00;
+      text-decoration: none;
+      border: 1px dashed #00FF00;
+      padding: 5px 10px;
+      margin: 5px;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+
+    .terminal-links a:hover {
+      background: rgba(0, 255, 0, 0.2);
+    }
+
+    /* ---------- Music Player ---------- */
+    .music-player {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .music-player button,
+    .music-player input[type=range] {
+      background: none;
+      color: #00FF00;
+      border: 1px solid #00FF00;
+      padding: 6px 12px;
+      margin: 5px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .music-player input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 150px;
+      height: 6px;
+      background: transparent;
+      border: 1px solid #00FF00;
+      outline: none;
+    }
+
+    .music-player input[type=range]::-webkit-slider-runnable-track {
+      height: 6px;
+      background: rgba(0, 255, 0, 0.3);
+      border: 1px solid #00FF00;
+    }
+
+    .music-player input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #00FF00;
+      border: none;
+      border-radius: 50%;
+      margin-top: -4px;
+      box-shadow: 0 0 3px #00FF00;
+    }
+
+    .music-player input[type=range]:hover::-webkit-slider-thumb {
+      background: #00FF00;
+      box-shadow: 0 0 6px #00FF00;
+    }
+
+    .music-player input[type=range]::-moz-range-track {
+      height: 6px;
+      background: rgba(0, 255, 0, 0.3);
+      border: 1px solid #00FF00;
+    }
+
+    .music-player input[type=range]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: #00FF00;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 0 3px #00FF00;
+    }
+
+    .music-player input[type=range]:hover::-moz-range-thumb {
+      background: #00FF00;
+      box-shadow: 0 0 6px #00FF00;
     }
   </style>
 </head>
 <body>
-
-  <!-- Background Video -->
-  <div id="videoWrapper" class="video-wrapper">
-    <video id="videoElement" autoplay muted loop>
-      <source src="https://github.com/Hezcheats/bio/raw/refs/heads/main/spirit.mp4" type="video/mp4">
-    </video>
+  <!-- CRT Boot -->
+  <div class="crt-container crt-sweep scanlines">
+    <div class="bg-animate"></div>
+    <pre id="boot-sequence"></pre>
   </div>
 
-  <!-- Welcome Text -->
-  <div id="fadeText" class="fade-text" style="font-size: xx-large; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    Welcome to catcore! Click anywhere to continue
-  </div>
-
-  <!-- Main Content -->
-  <div id="bioBox" class="content-wrapper">
-    <img src="https://i.pinimg.com/736x/f3/15/5f/f3155f33582d0c2b2313b516fe15e602.jpg" alt="Cat" style="width: 165px; height: 165px; object-fit: cover; border-radius: 10px; box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);">
-    <h1 style="font-size:smaller; filter:drop-shadow(2px 7px 6px black);">@purrorcode</h1>
-    <h1 style="text-align: center; color: black; filter:drop-shadow(4px 7px 4px black)">catty</h1>
-    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-      <a href="https://www.youtube.com/@purrorcode/" target="_blank">
-        <img src="https://cdn3.iconfinder.com/data/icons/social-network-30/512/social-06-512.png" alt="YouTube" style="width: 65px; height: 65px; filter: drop-shadow(0px 3px 10px black);">
-      </a>
-      <a href="https://discord.gg/KMzpQTQP4x" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/256/5968/5968756.png" alt="Discord" style="width: 65px; height: 65px; filter: drop-shadow(0px 3px 10px black);">
-      </a>
+  <!-- CRT Terminal Bio -->
+  <div id="bio-terminal" class="crt-sweep scanlines">
+    <div class="bg-animate"></div>
+    <img src="https://i.imgur.com/Mf0C3Qz.jpeg" alt="cat profile" />
+    <div class="bio-line">user: <strong>@purrorcode</strong></div>
+    <div class="bio-line">name: <strong>catty</strong></div>
+    <div class="bio-line" id="status-line">status: <span style="color: lime">Detecting...</span></div>
+    <div class="terminal-links">
+      <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
+      <a href="#"><i class="fab fa-discord"></i> Discord</a>
+    </div>
+    <div class="music-player">
+      <button onclick="toggleMusic()">▶️ Play / ⏸️ Pause</button>
+      <input type="range" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
     </div>
   </div>
 
-  <!-- Audio Element -->
-  <audio id="audio-player" src="https://audio.jukehost.co.uk/bAYU53gtWZ1LrhP35nXW9txnPMwexiop" type="audio/mp3"></audio>
-
-  <!-- Volume Controller -->
-  <div id="controller">
-    <img id="volume-icon" class="volume-icon" src="https://img.icons8.com/?size=100&id=15992&format=png&color=000000" alt="Volume" width="24" height="24">
-    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.2">
-  </div>
+  <!-- Sounds -->
+  <audio id="boot-sound" src="https://audio.jukehost.co.uk/mjAJ6wIZi2ZuaVy0rbkBHevM7WSH7di9"></audio>
+  <audio id="type-sound" src="type.mp3" preload="auto"></audio>
+  <audio id="music" src="https://audio.jukehost.co.uk/i8iafkfMQE6mLRpI34AzcKmMqRwLxHc3" loop></audio>
 
   <script>
-    const audioPlayer = document.getElementById('audio-player');
-    const fadeText = document.getElementById('fadeText');
-    const videoWrapper = document.getElementById('videoWrapper');
-    const bioBox = document.getElementById('bioBox');
-    const volumeSlider = document.getElementById('volume-slider');
-    const volumeIcon = document.getElementById('volume-icon');
-    const controller = document.getElementById('controller');
+    const bootMessages = [
+      "[ OK ] Initializing CRT boot sequence...",
+      "[ OK ] Loading cat interface...",
+      "[ OK ] Connecting to MeowNet...",
+      "[ OK ] Resolving purrorcode...",
+      "[ OK ] Terminal interface detected.",
+      "[ OK ] Drawing user card...",
+      "[ OK ] Boot complete."
+    ];
 
-    audioPlayer.volume = 0.2;
+    const bootContainer = document.getElementById('boot-sequence');
+    const crtWrapper = document.querySelector('.crt-container');
+    const bioTerminal = document.getElementById('bio-terminal');
+    const bootSound = document.getElementById('boot-sound');
+    const typeSound = document.getElementById('type-sound');
+    const music = document.getElementById('music');
 
-    window.addEventListener("load", () => {
+    function playSound(audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+
+    function printBootMessages(index = 0) {
+      if (index >= bootMessages.length) {
+        setTimeout(() => transitionToBio(), 800);
+        return;
+      }
+
+      const line = document.createElement('div');
+      line.className = 'boot-line';
+      line.textContent = bootMessages[index];
+      bootContainer.appendChild(line);
+      setTimeout(() => line.classList.add('visible'), 50);
+      playSound(typeSound);
+      setTimeout(() => printBootMessages(index + 1), 250 + Math.random() * 150);
+    }
+
+    function transitionToBio() {
+      crtWrapper.style.opacity = 0;
       setTimeout(() => {
-        fadeText.classList.add("visible");
-      }, 100);
-    });
+        crtWrapper.style.display = 'none';
+        bioTerminal.style.display = 'flex';
+        bioTerminal.style.animation = 'bioIn 1s ease forwards';
 
-    document.addEventListener("click", () => {
-      audioPlayer.play();
-      fadeText.classList.remove("visible");
-      videoWrapper.classList.add("visible");
-      bioBox.classList.add("visible");
-      controller.classList.add("visible");
-    }, { once: true });
+        // ✅ Set device/browser status line
+        const statusSpan = document.querySelector("#status-line span");
+        const device = getDeviceType();
+        const browser = getBrowserName();
+        statusSpan.textContent = `Device: ${device} | Browser: ${browser}`;
+      }, 800);
+    }
 
-    volumeSlider.addEventListener('input', () => {
-      audioPlayer.volume = volumeSlider.value;
-      audioPlayer.muted = false;
-      updateVolumeIcon();
-    });
+    function toggleMusic() {
+      if (music.paused) {
+        music.play();
+      } else {
+        music.pause();
+      }
+    }
 
-    volumeIcon.addEventListener('click', () => {
-      audioPlayer.muted = !audioPlayer.muted;
-      updateVolumeIcon();
-    });
+    function setVolume(val) {
+      music.volume = val;
+    }
 
-    function updateVolumeIcon() {
-    if (audioPlayer.muted || audioPlayer.volume === 0) {
-    volumeIcon.src = 'https://img.icons8.com/?size=100&id=9414&format=png&color=FFFFFF';
-    } else if (audioPlayer.volume < 0.5) {
-    volumeIcon.src = 'https://img.icons8.com/?size=100&id=9980&format=png&color=FFFFFF';
-    } else {
-    volumeIcon.src = 'https://img.icons8.com/?size=100&id=9982&format=png&color=FFFFFF';
-  }
-}
-    updateVolumeIcon();
+    function getBrowserName() {
+      const ua = navigator.userAgent;
+      if (/Edg\//.test(ua)) return "Edge";
+      if (/OPR\//.test(ua)) return "Opera";
+      if (/Chrome\//.test(ua)) return "Chrome";
+      if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return "Safari";
+      if (/Firefox\//.test(ua)) return "Firefox";
+      if (/MSIE|Trident/.test(ua)) return "Internet Explorer";
+      return "Unknown";
+    }
+
+    function getDeviceType() {
+      const ua = navigator.userAgent;
+      if (/Mobi|Android/i.test(ua)) return "Mobile";
+      if (/Tablet|iPad/i.test(ua)) return "Tablet";
+      return "Desktop";
+    }
+
+    window.onload = () => {
+      playSound(bootSound);
+      music.volume = 0.5;
+      printBootMessages();
+    };
   </script>
 </body>
 </html>
