@@ -2,370 +2,348 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CRT Bio Terminal</title>
+  <title>CatCoreOS</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet" />
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       background: black;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'JetBrains Mono', monospace;
       color: #00FF00;
+      height: 100vh; width: 100vw;
+      overflow: hidden;
     }
 
-    .crt-container, #bio-terminal {
-      width: 100%;
+    .screen {
+      display: none;
+      align-items: center;
+      justify-content: center;
       height: 100%;
-      position: relative;
-      padding: 20px;
-      box-sizing: border-box;
-      text-shadow: 0 0 2px #00FF00;
-    }
-
-    .crt-container {
-      animation: crtPowerOn 1.5s ease-out forwards;
-      opacity: 0;
-    }
-
-    @keyframes crtPowerOn {
-      0% {
-        opacity: 0;
-        transform: scaleY(0.01) scaleX(1.5);
-        filter: brightness(800%) blur(4px);
-      }
-      30% {
-        opacity: 1;
-        transform: scaleY(0.01) scaleX(1.2);
-      }
-      60% {
-        transform: scaleY(0.1) scaleX(1.1);
-        filter: brightness(200%);
-      }
-      100% {
-        opacity: 1;
-        transform: scaleY(1) scaleX(1);
-        filter: brightness(100%) blur(0);
-      }
-    }
-
-    .crt-sweep::after {
-      content: "";
-      position: absolute;
-      top: -150%;
-      left: 0;
       width: 100%;
-      height: 150%;
-      background: linear-gradient(
-        to bottom,
-        rgba(255,255,255,0) 0%,
-        rgba(255,255,255,0.04) 45%,
-        rgba(255,255,255,0.1) 50%,
-        rgba(255,255,255,0.04) 55%,
-        rgba(255,255,255,0) 100%
-      );
-      animation: verticalSweep 3s linear infinite;
-      z-index: 3;
-      pointer-events: none;
+      flex-direction: column;
+      position: absolute;
+      top: 0; left: 0;
     }
 
-    @keyframes verticalSweep {
-      0% { top: -150%; }
-      100% { top: 100%; }
+    #startup-screen {
+      display: flex;
+      background: black;
     }
 
-    .scanlines::before {
+    button {
+      font-family: inherit;
+      font-size: 20px;
+      padding: 12px 24px;
+      background: none;
+      color: #00FF00;
+      border: 2px solid #00FF00;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #00ff0010;
+    }
+
+    .crt {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .crt::after {
       content: "";
+      pointer-events: none;
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: repeating-linear-gradient(
+      background-image: repeating-linear-gradient(
         to bottom,
-        rgba(0, 255, 0, 0.05),
-        rgba(0, 255, 0, 0.05) 2px,
-        transparent 3px,
-        transparent 5px
-      );
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .bg-animate {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        45deg,
-        rgba(0, 255, 0, 0.05) 0,
+        rgba(0, 255, 0, 0.05) 0px,
         rgba(0, 255, 0, 0.05) 1px,
-        transparent 2px,
-        transparent 10px
+        transparent 1px,
+        transparent 3px
       );
-      animation: gridMove 10s linear infinite;
-      z-index: 1;
+      z-index: 10;
+      mix-blend-mode: overlay;
+      animation: flicker 1.5s infinite;
     }
 
-    @keyframes gridMove {
-      0% { background-position: 0 0; }
-      100% { background-position: 200px 200px; }
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 100% {
+        opacity: 0.035;
+      }
+      20%, 22% {
+        opacity: 0.065;
+      }
+    }
+
+    .crt, .crt * {
+      text-shadow: 0 0 2px #00ff00;
     }
 
     #boot-sequence {
-      z-index: 5;
-      transition: opacity 1s ease;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      text-align: left;
+      width: calc(100% - 40px);
+      max-height: calc(100% - 40px);
+      overflow: hidden;
+      font-size: 16px;
+      line-height: 1.4;
+      z-index: 1;
     }
 
     .boot-line {
       opacity: 0;
-      transition: opacity 0.2s ease-in;
+      transform: translateY(5px);
+      transition: opacity 0.3s ease-in, transform 0.3s ease-in;
     }
 
     .boot-line.visible {
       opacity: 1;
+      transform: translateY(0);
+    }
+
+    #login-screen img {
+      border-radius: 50%;
+      width: 100px;
+      margin-bottom: 12px;
+    }
+
+    #login-screen h2 {
+      margin-bottom: 12px;
     }
 
     #bio-terminal {
-      display: none;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      justify-content: center;
-      z-index: 5;
-      opacity: 0;
-      animation: bioIn 1s ease forwards;
-    }
-
-    @keyframes bioIn {
-      0% {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    #bio-terminal img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border: 2px solid #00FF00;
-      margin-bottom: 15px;
+      gap: 10px;
     }
 
     .bio-line {
-      margin: 5px 0;
+      font-size: 16px;
     }
 
     .terminal-links a {
       color: #00FF00;
-      text-decoration: none;
-      border: 1px dashed #00FF00;
-      padding: 5px 10px;
-      margin: 5px;
-      display: inline-block;
-      transition: background 0.2s;
+      text-decoration: underline;
+      margin-right: 10px;
     }
 
-    .terminal-links a:hover {
-      background: rgba(0, 255, 0, 0.2);
-    }
-
-    /* ---------- Music Player ---------- */
     .music-player {
       margin-top: 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
     }
 
-    .music-player button,
-    .music-player input[type=range] {
-      background: none;
-      color: #00FF00;
-      border: 1px solid #00FF00;
-      padding: 6px 12px;
-      margin: 5px;
-      cursor: pointer;
-      font-family: inherit;
+    .music-player button {
+      margin-bottom: 10px;
     }
 
-    .music-player input[type=range] {
+    #volume-slider {
       -webkit-appearance: none;
-      appearance: none;
-      width: 150px;
+      width: 200px;
       height: 6px;
-      background: transparent;
-      border: 1px solid #00FF00;
+      background: rgba(0, 255, 0, 0.2);
+      border: 1px solid #00ff00;
       outline: none;
+      cursor: pointer;
+      box-shadow: 0 0 4px #00ff00;
+      transition: background 0.3s;
     }
 
-    .music-player input[type=range]::-webkit-slider-runnable-track {
-      height: 6px;
-      background: rgba(0, 255, 0, 0.3);
-      border: 1px solid #00FF00;
-    }
-
-    .music-player input[type=range]::-webkit-slider-thumb {
+    #volume-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      background: #00FF00;
-      border: none;
-      border-radius: 50%;
-      margin-top: -4px;
-      box-shadow: 0 0 3px #00FF00;
+      width: 12px;
+      height: 12px;
+      background: #00ff00;
+      border-radius: 2px;
+      box-shadow: 0 0 4px #00ff00;
     }
 
-    .music-player input[type=range]:hover::-webkit-slider-thumb {
-      background: #00FF00;
-      box-shadow: 0 0 6px #00FF00;
+    #volume-slider::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      background: #00ff00;
+      border-radius: 2px;
+      box-shadow: 0 0 4px #00ff00;
     }
 
-    .music-player input[type=range]::-moz-range-track {
-      height: 6px;
-      background: rgba(0, 255, 0, 0.3);
-      border: 1px solid #00FF00;
-    }
-
-    .music-player input[type=range]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      background: #00FF00;
-      border: none;
-      border-radius: 50%;
-      box-shadow: 0 0 3px #00FF00;
-    }
-
-    .music-player input[type=range]:hover::-moz-range-thumb {
-      background: #00FF00;
-      box-shadow: 0 0 6px #00FF00;
+    @keyframes fadeScaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
   </style>
 </head>
 <body>
-  <!-- CRT Boot -->
-  <div class="crt-container crt-sweep scanlines">
-    <div class="bg-animate"></div>
-    <pre id="boot-sequence"></pre>
+  <div id="startup-screen" class="screen">
+    <button id="startup-button">STARTUP</button>
   </div>
 
-  <!-- CRT Terminal Bio -->
-  <div id="bio-terminal" class="crt-sweep scanlines">
-    <div class="bg-animate"></div>
-    <img src="https://i.imgur.com/Mf0C3Qz.jpeg" alt="cat profile" />
+  <div id="boot-screen" class="screen crt">
+    <div id="boot-sequence"></div>
+  </div>
+
+  <div id="login-screen" class="screen crt" style="display:none;">
+    <img id="pfp" src="https://i.pinimg.com/736x/df/e3/bf/dfe3bfb04d99e860dbdefaa1a5cb3c71.jpg" alt="Profile Picture" />
+    <h2>Guest</h2>
+    <button id="login-button-os">Click to Login</button>
+  </div>
+
+  <div id="bio-terminal" class="screen crt" style="display:none;">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2wfmuvToEM8RrCbenRb5REZAY7SG2LRFYtQ&s" alt="Profile" />
     <div class="bio-line">user: <strong>@purrorcode</strong></div>
     <div class="bio-line">name: <strong>catty</strong></div>
-    <div class="bio-line" id="status-line">status: <span style="color: lime">Detecting...</span></div>
+    <div class="bio-line" id="status-line">status: <span id="status-text">Detecting...</span></div>
     <div class="terminal-links">
-      <a href="#"><i class="fab fa-youtube"></i> YouTube</a>
-      <a href="#"><i class="fab fa-discord"></i> Discord</a>
+      <a href="https://discord.gg/KMzpQTQP4x" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://youtube.com/@purrorcode" target="_blank" rel="noopener noreferrer">Discord</a>
     </div>
     <div class="music-player">
-      <button onclick="toggleMusic()">▶️ Play / ⏸️ Pause</button>
-      <input type="range" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
+      <button id="toggle-music-button">Play / Pause</button>
+      <label for="volume-slider">Volume</label>
+      <input type="range" min="0" max="1" step="0.01" value="0.5" id="volume-slider" />
     </div>
   </div>
 
-  <!-- Sounds -->
-  <audio id="boot-sound" src="https://audio.jukehost.co.uk/mjAJ6wIZi2ZuaVy0rbkBHevM7WSH7di9"></audio>
-  <audio id="type-sound" src="type.mp3" preload="auto"></audio>
-  <audio id="music" src="https://audio.jukehost.co.uk/i8iafkfMQE6mLRpI34AzcKmMqRwLxHc3" loop></audio>
+  <audio id="boot-sound" src="https://audio.jukehost.co.uk/TCmfFnivUbxviqakENmszPiMRXtyumof"></audio>
+  <audio id="type-sound" src="https://audio.jukehost.co.uk/2yFwCCMo7iNX8WlWhFxrHjLJGP3WyZDN" loop></audio>
+  <audio id="music" src="https://audio.jukehost.co.uk/bAYU53gtWZ1LrhP35nXW9txnPMwexiop" loop></audio>
 
-  <script>
-    const bootMessages = [
-      "[ OK ] Initializing CRT boot sequence...",
-      "[ OK ] Loading cat interface...",
-      "[ OK ] Connecting to MeowNet...",
-      "[ OK ] Resolving purrorcode...",
-      "[ OK ] Terminal interface detected.",
-      "[ OK ] Drawing user card...",
-      "[ OK ] Boot complete."
-    ];
+<script>
+  const startupScreen = document.getElementById('startup-screen');
+  const bootScreen = document.getElementById('boot-screen');
+  const bootSequence = document.getElementById('boot-sequence');
+  const loginScreen = document.getElementById('login-screen');
+  const bioTerminal = document.getElementById('bio-terminal');
 
-    const bootContainer = document.getElementById('boot-sequence');
-    const crtWrapper = document.querySelector('.crt-container');
-    const bioTerminal = document.getElementById('bio-terminal');
-    const bootSound = document.getElementById('boot-sound');
-    const typeSound = document.getElementById('type-sound');
-    const music = document.getElementById('music');
+  const bootSound = document.getElementById('boot-sound');
+  const typeSound = document.getElementById('type-sound');
+  const music = document.getElementById('music');
 
-    function playSound(audio) {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
-    }
+  const statusText = document.getElementById('status-text');
 
-    function printBootMessages(index = 0) {
-      if (index >= bootMessages.length) {
-        setTimeout(() => transitionToBio(), 800);
-        return;
+  function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  }
+
+  function fadeOutAudio(audio, duration) {
+    let volume = audio.volume;
+    const stepTime = 50;
+    const steps = duration / stepTime;
+    let stepCount = 0;
+    const fadeInterval = setInterval(() => {
+      stepCount++;
+      volume -= (audio.volume / steps);
+      if (volume <= 0) {
+        volume = 0;
+        audio.pause();
+        audio.currentTime = 0;
+        clearInterval(fadeInterval);
       }
+      audio.volume = volume;
+    }, stepTime);
+  }
 
-      const line = document.createElement('div');
-      line.className = 'boot-line';
-      line.textContent = bootMessages[index];
-      bootContainer.appendChild(line);
-      setTimeout(() => line.classList.add('visible'), 50);
-      playSound(typeSound);
-      setTimeout(() => printBootMessages(index + 1), 250 + Math.random() * 150);
+  const bootMessages = [
+    "Booting CatCoreOS v1.1...",
+    "Initializing memory...",
+    "Detecting hardware...",
+    "Device Type: " + getDeviceType(),
+    "Browser: " + getBrowserName(),
+    "Loading drivers...",
+    "Mounting filesystem...",
+    "Starting services...",
+    "System ready."
+  ];
+
+  function printBootMessages(i = 0) {
+    if (i >= bootMessages.length) {
+      fadeOutAudio(typeSound, 1500);
+      return setTimeout(() => {
+        bootScreen.style.display = 'none';
+        loginScreen.style.display = 'flex';
+        loginScreen.style.animation = 'fadeScaleIn 0.8s forwards';
+      }, 1500);
     }
 
-    function transitionToBio() {
-      crtWrapper.style.opacity = 0;
-      setTimeout(() => {
-        crtWrapper.style.display = 'none';
-        bioTerminal.style.display = 'flex';
-        bioTerminal.style.animation = 'bioIn 1s ease forwards';
+    const line = document.createElement('div');
+    line.className = 'boot-line';
+    line.textContent = bootMessages[i];
+    bootSequence.appendChild(line);
+    bootSequence.scrollTop = bootSequence.scrollHeight;
 
-        // ✅ Set device/browser status line
-        const statusSpan = document.querySelector("#status-line span");
-        const device = getDeviceType();
-        const browser = getBrowserName();
-        statusSpan.textContent = `Device: ${device} | Browser: ${browser}`;
-      }, 800);
+    setTimeout(() => {
+      line.classList.add('visible');
+    }, 50);
+
+    setTimeout(() => {
+      printBootMessages(i + 1);
+    }, 600);
+  }
+
+  document.getElementById('startup-button').onclick = () => {
+    startupScreen.style.display = 'none';
+    bootScreen.style.display = 'flex';
+    playSound(bootSound);
+
+    typeSound.loop = true;
+    typeSound.volume = 0.3;
+    typeSound.play().catch(() => {});
+
+    bootSequence.innerHTML = '';
+    printBootMessages();
+  };
+
+  document.getElementById('login-button-os').onclick = () => {
+    loginScreen.style.display = 'none';
+    bioTerminal.style.display = 'flex';
+    bioTerminal.style.animation = 'fadeScaleIn 0.8s forwards';
+    music.volume = document.getElementById('volume-slider').value;
+    music.play().catch(() => {});
+    statusText.textContent = "Online";
+  };
+
+  const toggleMusicButton = document.getElementById('toggle-music-button');
+  const volumeSlider = document.getElementById('volume-slider');
+  toggleMusicButton.onclick = () => {
+    if (music.paused) {
+      music.volume = volumeSlider.value;
+      music.play().catch(() => {});
+    } else {
+      music.pause();
     }
+  };
+  volumeSlider.oninput = () => {
+    music.volume = volumeSlider.value;
+  };
 
-    function toggleMusic() {
-      if (music.paused) {
-        music.play();
-      } else {
-        music.pause();
-      }
-    }
+  function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/mobile|android|touch|webos|hpwos/i.test(ua)) return "Mobile";
+    if (/tablet|ipad|playbook|silk/i.test(ua)) return "Tablet";
+    return "Desktop";
+  }
 
-    function setVolume(val) {
-      music.volume = val;
-    }
-
-    function getBrowserName() {
-      const ua = navigator.userAgent;
-      if (/Edg\//.test(ua)) return "Edge";
-      if (/OPR\//.test(ua)) return "Opera";
-      if (/Chrome\//.test(ua)) return "Chrome";
-      if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return "Safari";
-      if (/Firefox\//.test(ua)) return "Firefox";
-      if (/MSIE|Trident/.test(ua)) return "Internet Explorer";
-      return "Unknown";
-    }
-
-    function getDeviceType() {
-      const ua = navigator.userAgent;
-      if (/Mobi|Android/i.test(ua)) return "Mobile";
-      if (/Tablet|iPad/i.test(ua)) return "Tablet";
-      return "Desktop";
-    }
-
-    window.onload = () => {
-      playSound(bootSound);
-      music.volume = 0.5;
-      printBootMessages();
-    };
-  </script>
+  function getBrowserName() {
+    const ua = navigator.userAgent;
+    if (ua.indexOf("Chrome") > -1 && ua.indexOf("Edg") === -1 && ua.indexOf("OPR") === -1) return "Chrome";
+    if (ua.indexOf("Firefox") > -1) return "Firefox";
+    if (ua.indexOf("Safari") > -1 && ua.indexOf("Chrome") === -1) return "Safari";
+    if (ua.indexOf("Edg") > -1) return "Edge";
+    if (ua.indexOf("OPR") > -1) return "Opera";
+    return "Unknown";
+  }
+</script>
 </body>
 </html>
