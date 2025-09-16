@@ -1,349 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <title>CatCoreOS</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>catcore</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    html, body {
-      margin: 0; padding: 0;
-      background: black;
-      font-family: 'JetBrains Mono', monospace;
-      color: #00FF00;
-      height: 100vh; width: 100vw;
+    body {
+      background: #0f0f12;
       overflow: hidden;
     }
-
-    .screen {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      width: 100%;
-      flex-direction: column;
-      position: absolute;
-      top: 0; left: 0;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(8px) saturate(180%);
+      -webkit-backdrop-filter: blur(8px) saturate(180%);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+      border-radius: 24px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: default;
     }
-
-    #startup-screen {
-      display: flex;
-      background: black;
-    }
-
-    button {
-      font-family: inherit;
-      font-size: 20px;
-      padding: 12px 24px;
-      background: none;
-      color: #00FF00;
-      border: 2px solid #00FF00;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #00ff0010;
-    }
-
-    .crt {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .crt::after {
-      content: "";
-      pointer-events: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: repeating-linear-gradient(
-        to bottom,
-        rgba(0, 255, 0, 0.05) 0px,
-        rgba(0, 255, 0, 0.05) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      z-index: 10;
-      mix-blend-mode: overlay;
-      animation: flicker 1.5s infinite;
-    }
-
-    @keyframes flicker {
-      0%, 19%, 21%, 23%, 100% {
-        opacity: 0.035;
-      }
-      20%, 22% {
-        opacity: 0.065;
-      }
-    }
-
-    .crt, .crt * {
-      text-shadow: 0 0 2px #00ff00;
-    }
-
-    #boot-sequence {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      text-align: left;
-      width: calc(100% - 40px);
-      max-height: calc(100% - 40px);
-      overflow: hidden;
-      font-size: 16px;
-      line-height: 1.4;
-      z-index: 1;
-    }
-
-    .boot-line {
-      opacity: 0;
-      transform: translateY(5px);
-      transition: opacity 0.3s ease-in, transform 0.3s ease-in;
-    }
-
-    .boot-line.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    #login-screen img {
-      border-radius: 50%;
-      width: 100px;
-      margin-bottom: 12px;
-    }
-
-    #login-screen h2 {
-      margin-bottom: 12px;
-    }
-
-    #bio-terminal {
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .bio-line {
-      font-size: 16px;
-    }
-
-    .terminal-links a {
-      color: #00FF00;
-      text-decoration: underline;
-      margin-right: 10px;
-    }
-
-    .music-player {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .music-player button {
-      margin-bottom: 10px;
-    }
-
-    #volume-slider {
-      -webkit-appearance: none;
-      width: 200px;
-      height: 6px;
-      background: rgba(0, 255, 0, 0.2);
-      border: 1px solid #00ff00;
-      outline: none;
-      cursor: pointer;
-      box-shadow: 0 0 4px #00ff00;
-      transition: background 0.3s;
-    }
-
-    #volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px;
-      height: 12px;
-      background: #00ff00;
-      border-radius: 2px;
-      box-shadow: 0 0 4px #00ff00;
-    }
-
-    #volume-slider::-moz-range-thumb {
-      width: 12px;
-      height: 12px;
-      background: #00ff00;
-      border-radius: 2px;
-      box-shadow: 0 0 4px #00ff00;
-    }
-
-    @keyframes fadeScaleIn {
+    @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: translateY(30px);
       }
       to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0);
+      }
+    }
+    .animate-fadeInUp {
+      animation: fadeInUp 0.8s ease forwards;
+    }
+    .hover-glow {
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .hover-glow:hover {
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.9));
+      transform: scale(1.2);
+    }
+    .avatar-wrapper {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      margin: 0 auto;
+      border-radius: 50%;
+      padding: 4px;
+      background: linear-gradient(270deg, #a78bfa, #f472b6, #60a5fa, #a78bfa);
+      background-size: 600% 600%;
+      animation: shineRing 5s ease infinite;
+      box-shadow: 0 0 15px rgba(167, 139, 250, 0.8);
+    }
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
+      object-fit: cover;
+      background: #111;
+    }
+    @keyframes shineRing {
+      0% {
+        background-position: 0% 50%;
+        box-shadow: 0 0 15px rgba(167, 139, 250, 0.8);
+      }
+      50% {
+        background-position: 100% 50%;
+        box-shadow: 0 0 25px rgba(244, 114, 182, 0.9);
+      }
+      100% {
+        background-position: 0% 50%;
+        box-shadow: 0 0 15px rgba(167, 139, 250, 0.8);
       }
     }
   </style>
 </head>
-<body>
-  <div id="startup-screen" class="screen">
-    <button id="startup-button">STARTUP</button>
-  </div>
+<body class="flex items-center justify-center min-h-screen relative text-white">
 
-  <div id="boot-screen" class="screen crt">
-    <div id="boot-sequence"></div>
-  </div>
+  <div id="tsparticles" class="absolute inset-0 -z-10"></div>
 
-  <div id="login-screen" class="screen crt" style="display:none;">
-    <img id="pfp" src="https://i.pinimg.com/736x/df/e3/bf/dfe3bfb04d99e860dbdefaa1a5cb3c71.jpg" alt="Profile Picture" />
-    <h2>Guest</h2>
-    <button id="login-button-os">Click to Login</button>
-  </div>
-
-  <div id="bio-terminal" class="screen crt" style="display:none;">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2wfmuvToEM8RrCbenRb5REZAY7SG2LRFYtQ&s" alt="Profile" />
-    <div class="bio-line">user: <strong>@purrorcode</strong></div>
-    <div class="bio-line">name: <strong>catty</strong></div>
-    <div class="bio-line" id="status-line">status: <span id="status-text">Detecting...</span></div>
-    <div class="terminal-links">
-      <a href="https://youtube.com/@purrorcode" target="_blank" rel="noopener noreferrer">YouTube</a>
-      <a href="https://discord.gg/KMzpQTQP4x" target="_blank" rel="noopener noreferrer">Discord</a>
+  <div id="glassCard" class="glass-card max-w-md w-full p-8 rounded-3xl text-center animate-fadeInUp" tabindex="0" aria-label="Profile Card with tilt effect">
+    
+    <div class="avatar-wrapper">
+      <img src="https://avatars.githubusercontent.com/u/152616221?s=96&v=4" alt="Profile Picture" />
     </div>
-    <div class="music-player">
-      <button id="toggle-music-button">Play / Pause</button>
-      <label for="volume-slider">Volume</label>
-      <input type="range" min="0" max="1" step="0.01" value="0.5" id="volume-slider" />
+
+    <h1 class="mt-6 text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 drop-shadow-lg">
+      luna
+    </h1>
+
+    <p class="mt-2 text-lg font-medium text-white/80">scaffoldwalk</p>
+    <p class="mt-2 text-sm text-purple-300">📍 Norway</p>
+
+    <p class="mt-5 text-white/75 leading-relaxed px-4">
+      Minecraft Cheating Content Creator!
+    </p>
+
+    <div class="flex justify-center gap-8 mt-6">
+      <a href="#" class="hover-glow" aria-label="GitHub Profile">
+        <img src="https://github.com/lunolie/bio/blob/main/github-svgrepo-com.png?raw=true" alt="GitHub Icon" class="w-10 h-10" />
+      </a>
+      <a href="#" class="hover-glow" aria-label="YouTube Channel">
+        <img src="https://github.com/lunolie/bio/blob/main/youtube-svgrepo-com.png?raw=true" alt="YouTube Icon" class="w-10 h-10" />
+      </a>
+      <a href="#" class="hover-glow" aria-label="Instagram Profile">
+        <img src="https://github.com/lunolie/bio/blob/main/instagram-svgrepo-com(1).png?raw=true" alt="Instagram Icon" class="w-10 h-10" />
+      </a>
     </div>
+
+    <p class="mt-6 text-xs text-white/40">Made with ❄️ from Norway</p>
   </div>
 
-  <audio id="boot-sound" src="https://audio.jukehost.co.uk/TCmfFnivUbxviqakENmszPiMRXtyumof"></audio>
-  <audio id="type-sound" src="https://audio.jukehost.co.uk/2yFwCCMo7iNX8WlWhFxrHjLJGP3WyZDN" loop></audio>
-  <audio id="music" src="https://audio.jukehost.co.uk/bAYU53gtWZ1LrhP35nXW9txnPMwexiop" loop></audio>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+  <script>
+    const card = document.getElementById('glassCard');
 
-<script>
-  const startupScreen = document.getElementById('startup-screen');
-  const bootScreen = document.getElementById('boot-screen');
-  const bootSequence = document.getElementById('boot-sequence');
-  const loginScreen = document.getElementById('login-screen');
-  const bioTerminal = document.getElementById('bio-terminal');
+    card.style.transition = "transform 0.2s ease";
 
-  const bootSound = document.getElementById('boot-sound');
-  const typeSound = document.getElementById('type-sound');
-  const music = document.getElementById('music');
+    function handleMove(e) {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
 
-  const statusText = document.getElementById('status-text');
+      const rotateX = ((y - centerY) / centerY) * 8;
+      const rotateY = ((x - centerX) / centerX) * -8;
 
-  function playSound(audio) {
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
-  }
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04,1.04,1.04)`;
+    }
 
-  function fadeOutAudio(audio, duration) {
-    let volume = audio.volume;
-    const stepTime = 50;
-    const steps = duration / stepTime;
-    let stepCount = 0;
-    const fadeInterval = setInterval(() => {
-      stepCount++;
-      volume -= (audio.volume / steps);
-      if (volume <= 0) {
-        volume = 0;
-        audio.pause();
-        audio.currentTime = 0;
-        clearInterval(fadeInterval);
+    function resetTransform() {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+    }
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.1s ease';
+    });
+    card.addEventListener('mousemove', handleMove);
+    card.addEventListener('mouseleave', () => {
+      resetTransform();
+      card.style.transition = 'transform 0.5s ease';
+    });
+
+    tsParticles.load("tsparticles", {
+      fullScreen: { enable: true, zIndex: -1 },
+      fpsLimit: 45,
+      detectRetina: true,
+      particles: {
+        number: { value: 70, density: { enable: true, area: 900 } },
+        color: { value: ["#ffffff", "#a78bfa", "#60a5fa", "#f472b6"] },
+        shape: { type: "circle" },
+        opacity: {
+          value: 0.8,
+          random: true,
+          animation: { enable: true, speed: 1.5, minimumValue: 0.3, sync: false }
+        },
+        size: {
+          value: { min: 2, max: 6 },
+          random: true,
+          animation: { enable: true, speed: 3, minimumValue: 2, sync: false }
+        },
+        move: {
+          enable: true,
+          speed: 1.2,
+          direction: "none",
+          random: true,
+          straight: false,
+          outModes: { default: "out" }
+        },
+        links: { enable: false }
+      },
+      interactivity: {
+        events: {
+          onHover: { enable: true, mode: "repulse" },
+          onClick: { enable: true, mode: "push" }
+        },
+        modes: {
+          repulse: { distance: 100, duration: 0.4 },
+          push: { quantity: 4 }
+        }
       }
-      audio.volume = volume;
-    }, stepTime);
-  }
-
-  const bootMessages = [
-    "Booting CatCoreOS v1.1...",
-    "Initializing memory...",
-    "Detecting hardware...",
-    "Device Type: " + getDeviceType(),
-    "Browser: " + getBrowserName(),
-    "Loading drivers...",
-    "Mounting filesystem...",
-    "Starting services...",
-    "System ready."
-  ];
-
-  function printBootMessages(i = 0) {
-    if (i >= bootMessages.length) {
-      fadeOutAudio(typeSound, 1500);
-      return setTimeout(() => {
-        bootScreen.style.display = 'none';
-        loginScreen.style.display = 'flex';
-        loginScreen.style.animation = 'fadeScaleIn 0.8s forwards';
-      }, 1500);
-    }
-
-    const line = document.createElement('div');
-    line.className = 'boot-line';
-    line.textContent = bootMessages[i];
-    bootSequence.appendChild(line);
-    bootSequence.scrollTop = bootSequence.scrollHeight;
-
-    setTimeout(() => {
-      line.classList.add('visible');
-    }, 50);
-
-    setTimeout(() => {
-      printBootMessages(i + 1);
-    }, 600);
-  }
-
-  document.getElementById('startup-button').onclick = () => {
-    startupScreen.style.display = 'none';
-    bootScreen.style.display = 'flex';
-    playSound(bootSound);
-
-    typeSound.loop = true;
-    typeSound.volume = 0.3;
-    typeSound.play().catch(() => {});
-
-    bootSequence.innerHTML = '';
-    printBootMessages();
-  };
-
-  document.getElementById('login-button-os').onclick = () => {
-    loginScreen.style.display = 'none';
-    bioTerminal.style.display = 'flex';
-    bioTerminal.style.animation = 'fadeScaleIn 0.8s forwards';
-    music.volume = document.getElementById('volume-slider').value;
-    music.play().catch(() => {});
-    statusText.textContent = "Online";
-  };
-
-  const toggleMusicButton = document.getElementById('toggle-music-button');
-  const volumeSlider = document.getElementById('volume-slider');
-  toggleMusicButton.onclick = () => {
-    if (music.paused) {
-      music.volume = volumeSlider.value;
-      music.play().catch(() => {});
-    } else {
-      music.pause();
-    }
-  };
-  volumeSlider.oninput = () => {
-    music.volume = volumeSlider.value;
-  };
-
-  function getDeviceType() {
-    const ua = navigator.userAgent;
-    if (/mobile|android|touch|webos|hpwos/i.test(ua)) return "Mobile";
-    if (/tablet|ipad|playbook|silk/i.test(ua)) return "Tablet";
-    return "Desktop";
-  }
-
-  function getBrowserName() {
-    const ua = navigator.userAgent;
-    if (ua.indexOf("Chrome") > -1 && ua.indexOf("Edg") === -1 && ua.indexOf("OPR") === -1) return "Chrome";
-    if (ua.indexOf("Firefox") > -1) return "Firefox";
-    if (ua.indexOf("Safari") > -1 && ua.indexOf("Chrome") === -1) return "Safari";
-    if (ua.indexOf("Edg") > -1) return "Edge";
-    if (ua.indexOf("OPR") > -1) return "Opera";
-    return "Unknown";
-  }
-</script>
+    });
+  </script>
 </body>
 </html>
